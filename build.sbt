@@ -713,10 +713,14 @@ lazy val scioParquet: Project = Project(
       ensureSourceManaged.value
       (compile in Compile).value
     }.value,
+    run / fork := true,
     javacOptions ++= Seq("-s", (sourceManaged.value / "main").toString),
     description := "Scio add-on for Parquet",
     libraryDependencies ++= Seq(
       "me.lyh" %% "parquet-avro-extra" % parquetAvroExtraVersion,
+      "me.lyh" %% "parquet-types" % "0.2.4-SNAPSHOT",
+      "org.apache.beam" % "beam-runners-google-cloud-dataflow-java" % beamVersion,
+      "com.spotify.data" % "spotify-data-schemas" % "1.0-SNAPSHOT",
       "com.google.cloud.bigdataoss" % "gcs-connector" % gcsConnectorVersion,
       "org.apache.beam" % "beam-sdks-java-io-hadoop-format" % beamVersion,
       "org.apache.hadoop" % "hadoop-client" % hadoopVersion,
