@@ -35,13 +35,13 @@ object ParquetTest {
     run("ParquetRead.Projection4",
       Projection[TrackEntity2](_.getTrackGid))
 
-    run("ParquetRead.Filter1",
+    run("ParquetRead.Predicate1",
       predicate = Predicate[TrackEntity2](_.getGlobalPopularity.getRank < 1000000L))
-    run("ParquetRead.Filter2",
+    run("ParquetRead.Predicate2",
       predicate = Predicate[TrackEntity2](_.getGlobalPopularity.getRank < 100000L))
-    run("ParquetRead.Filter3",
+    run("ParquetRead.Predicate3",
       predicate = Predicate[TrackEntity2](_.getGlobalPopularity.getRank < 10000L))
-    run("ParquetRead.Filter4",
+    run("ParquetRead.Predicate4",
       predicate = Predicate[TrackEntity2](_.getGlobalPopularity.getRank < 1000L))
   }
 
@@ -57,6 +57,7 @@ object ParquetTest {
 
     val (sc, _) = ContextAndArgs(argz)
     sc.setAppName(appName)
+    sc.setJobName(s"$appName-neville-${System.currentTimeMillis()}")
 
     sc.parquetAvroFile[TrackEntity2](input, projection, predicate)
       .map(_ => 0)
