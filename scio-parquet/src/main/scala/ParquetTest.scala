@@ -57,7 +57,7 @@ object ParquetTest {
 
     val (sc, _) = ContextAndArgs(argz)
     sc.setAppName(appName)
-    sc.setJobName(s"$appName-neville-${System.currentTimeMillis()}")
+    sc.setJobName(s"${appName.toLowerCase().replace('.', '-')}-neville-${System.currentTimeMillis()}")
 
     sc.parquetAvroFile[TrackEntity2](input, projection, predicate)
       .map(_ => 0)
