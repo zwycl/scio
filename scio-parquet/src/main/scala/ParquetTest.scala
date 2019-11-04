@@ -43,6 +43,8 @@ object ParquetTest {
       predicate = Predicate[TrackEntity2](_.getGlobalPopularity.getRank < 10000L))
     run("ParquetRead.Predicate4",
       predicate = Predicate[TrackEntity2](_.getGlobalPopularity.getRank < 1000L))
+    run("ParquetRead.Predicate5",
+      predicate = Predicate[TrackEntity2](_.getGlobalPopularity.getRank < 10L))
   }
 
   def run(appName: String, projection: Schema = null, predicate: FilterPredicate = null): Unit = {
