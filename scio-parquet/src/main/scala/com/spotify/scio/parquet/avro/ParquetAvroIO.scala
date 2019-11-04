@@ -60,9 +60,6 @@ final case class ParquetAvroIO[T: ClassTag: Coder](path: String) extends ScioIO[
     job.getConfiguration.set(
       GoogleHadoopFileSystemConfiguration.GCS_INPUT_STREAM_FADVISE.getKey,
       Fadvise.RANDOM.toString)
-    println(
-      GoogleHadoopFileSystemConfiguration.GCS_INPUT_STREAM_FADVISE.getKey,
-      Fadvise.RANDOM.toString)
 
     job.setInputFormatClass(classOf[AvroParquetInputFormat[T]])
     job.getConfiguration.setClass("key.class", classOf[Void], classOf[Void])
