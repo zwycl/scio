@@ -20,6 +20,8 @@ package com.spotify.scio.parquet.avro
 import java.lang.{Boolean => JBoolean}
 import java.nio.channels.{Channels, SeekableByteChannel}
 
+import com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystemConfiguration
+import com.google.cloud.hadoop.gcsio.GoogleCloudStorageReadOptions.Fadvise
 import com.spotify.scio.ScioContext
 import com.spotify.scio.io.{ScioIO, Tap, TapOf}
 import com.spotify.scio.util.{ClosureCleaner, ScioUtil}
@@ -55,6 +57,13 @@ final case class ParquetAvroIO[T: ClassTag: Coder](path: String) extends ScioIO[
   override protected def read(sc: ScioContext, params: ReadP): SCollection[T] = {
     val job = Job.getInstance()
     setInputPaths(sc, job, path)
+    job.getConfiguration.set(
+      GoogleHadoopFileSystemConfiguration.GCS_INPUT_STREAM_FADVISE.getKey,
+      Fadvise.RANDOM.toString)
+    println(
+      GoogleHadoopFileSystemConfiguration.GCS_INPUT_STREAM_FADVISE.getKey,
+      Fadvise.RANDOM.toString)
+
     job.setInputFormatClass(classOf[AvroParquetInputFormat[T]])
     job.getConfiguration.setClass("key.class", classOf[Void], classOf[Void])
     job.getConfiguration.setClass("value.class", params.avroClass, params.avroClass)
