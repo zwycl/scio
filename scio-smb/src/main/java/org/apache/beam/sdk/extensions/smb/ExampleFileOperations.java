@@ -170,7 +170,6 @@ public class ExampleFileOperations extends FileOperations<Example> {
 
     @Override
     public Example readNext() throws IOException, NoSuchElementException {
-      next = reader.read();
       if (next == null) {
         throw new NoSuchElementException();
       }
