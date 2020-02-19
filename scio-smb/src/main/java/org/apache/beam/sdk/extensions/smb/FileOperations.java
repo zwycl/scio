@@ -17,6 +17,7 @@
 
 package org.apache.beam.sdk.extensions.smb;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.channels.ReadableByteChannel;
@@ -134,7 +135,7 @@ public abstract class FileOperations<V> implements Serializable, HasDisplayData 
       this.compression = compression;
     }
 
-    private void prepareWrite(WritableByteChannel channel) throws IOException {
+    protected void prepareWrite(WritableByteChannel channel) throws IOException {
       this.channel = compression.writeCompressed(channel);
       sink.open(this.channel);
     }
@@ -147,6 +148,9 @@ public abstract class FileOperations<V> implements Serializable, HasDisplayData 
     public void close() throws IOException {
       try {
         sink.flush();
+        if (sink instanceof Closeable) {
+          ((Closeable) sink).close();
+        }
       } catch (IOException e) {
         // always close channel
         channel.close();
