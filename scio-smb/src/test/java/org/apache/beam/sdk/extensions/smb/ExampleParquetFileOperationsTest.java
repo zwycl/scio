@@ -19,9 +19,13 @@ package org.apache.beam.sdk.extensions.smb;
 
 import com.google.protobuf.ByteString;
 import me.lyh.parquet.tensorflow.Schema;
+import org.apache.beam.sdk.io.Compression;
 import org.apache.beam.sdk.io.fs.ResolveOptions;
 import org.apache.beam.sdk.io.fs.ResourceId;
+import org.apache.beam.sdk.transforms.display.DisplayData;
+import org.apache.beam.sdk.util.MimeTypes;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
+import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,6 +39,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.apache.beam.sdk.extensions.smb.TestUtils.fromFolder;
+import static org.apache.beam.sdk.transforms.display.DisplayDataMatchers.hasDisplayItem;
 
 /** Unit tests for {@link ExampleParquetFileOperations}. */
 public class ExampleParquetFileOperationsTest {
@@ -94,6 +99,23 @@ public class ExampleParquetFileOperationsTest {
       expected = examples.stream().map(fn).collect(Collectors.toList());
     }
     Assert.assertEquals(expected, actual);
+  }
+
+  @Test
+  public void testDisplayData() {
+    final ExampleParquetFileOperations fileOperations = ExampleParquetFileOperations.of(
+        schema, Collections.singletonList("int64_req"), CompressionCodecName.SNAPPY);
+
+    final DisplayData displayData = DisplayData.from(fileOperations);
+    MatcherAssert.assertThat(
+        displayData, hasDisplayItem("FileOperations", ExampleParquetFileOperations.class));
+    MatcherAssert.assertThat(displayData, hasDisplayItem("mimeType", MimeTypes.BINARY));
+    MatcherAssert.assertThat(
+        displayData, hasDisplayItem("compression", Compression.UNCOMPRESSED.toString()));
+    MatcherAssert.assertThat(displayData, hasDisplayItem("writerSchema", schema.toJson()));
+    MatcherAssert.assertThat(displayData, hasDisplayItem("readerFields", "[int64_req]"));
+    MatcherAssert.assertThat(
+        displayData, hasDisplayItem("codec", CompressionCodecName.SNAPPY.name()));
   }
 
   private Feature longs(long... xs) {

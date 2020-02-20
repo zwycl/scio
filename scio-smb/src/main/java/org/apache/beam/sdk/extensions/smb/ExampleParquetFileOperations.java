@@ -24,6 +24,7 @@ import org.apache.beam.sdk.coders.Coder;
 import org.apache.beam.sdk.extensions.protobuf.ProtoCoder;
 import org.apache.beam.sdk.io.Compression;
 import org.apache.beam.sdk.io.FileIO;
+import org.apache.beam.sdk.transforms.display.DisplayData;
 import org.apache.beam.sdk.util.MimeTypes;
 import org.apache.parquet.hadoop.ParquetReader;
 import org.apache.parquet.hadoop.ParquetWriter;
@@ -98,6 +99,14 @@ public class ExampleParquetFileOperations extends FileOperations<Example> {
   public static ExampleParquetFileOperations readOnly(List<String> readerFields,
                                                       CompressionCodecName codec) {
     return of(null, readerFields, codec);
+  }
+
+  @Override
+  public void populateDisplayData(DisplayData.Builder builder) {
+    super.populateDisplayData(builder);
+    builder.addIfNotNull(DisplayData.item("writerSchema", writerSchemaString));
+    builder.addIfNotNull(DisplayData.item("readerFields", readerFields.toString()));
+    builder.add(DisplayData.item("codec", codec.name()));
   }
 
   @Override
