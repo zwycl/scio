@@ -36,8 +36,8 @@ import java.util.stream.Stream;
 
 import static org.apache.beam.sdk.extensions.smb.TestUtils.fromFolder;
 
-/** Unit tests for {@link ExampleFileOperations}. */
-public class ExampleFileOperationsTest {
+/** Unit tests for {@link ExampleParquetFileOperations}. */
+public class ExampleParquetFileOperationsTest {
   @Rule public final TemporaryFolder output = new TemporaryFolder();
 
   private final Schema schema = Schema.newBuilder()
@@ -74,7 +74,7 @@ public class ExampleFileOperationsTest {
   }
 
   private void test(List<String> fields, CompressionCodecName codec) throws Exception {
-    final ExampleFileOperations fileOperations = ExampleFileOperations.of(schema, fields, codec);
+    final ExampleParquetFileOperations fileOperations = ExampleParquetFileOperations.of(schema, fields, codec);
     final ResourceId file = fromFolder(output).resolve("file.parquet", ResolveOptions.StandardResolveOptions.RESOLVE_FILE);
 
     FileOperations.Writer<Example> writer = fileOperations.createWriter(file);

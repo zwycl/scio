@@ -24,10 +24,7 @@ import org.apache.beam.sdk.coders.Coder;
 import org.apache.beam.sdk.extensions.protobuf.ProtoCoder;
 import org.apache.beam.sdk.io.Compression;
 import org.apache.beam.sdk.io.FileIO;
-import org.apache.beam.sdk.io.FileSystems;
-import org.apache.beam.sdk.io.fs.ResourceId;
 import org.apache.beam.sdk.util.MimeTypes;
-import org.apache.parquet.Preconditions;
 import org.apache.parquet.hadoop.ParquetReader;
 import org.apache.parquet.hadoop.ParquetWriter;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
@@ -35,7 +32,6 @@ import org.apache.parquet.io.*;
 import org.tensorflow.example.Example;
 
 import java.io.Closeable;
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.Channels;
@@ -49,16 +45,16 @@ import java.util.NoSuchElementException;
  * {@link org.apache.beam.sdk.extensions.smb.FileOperations} implementation for TensorFlow
  * {@link org.tensorflow.example.Example} as Parquet files.
  */
-public class ExampleFileOperations extends FileOperations<Example> {
+public class ExampleParquetFileOperations extends FileOperations<Example> {
   private static final CompressionCodecName DEFAULT_CODEC = CompressionCodecName.SNAPPY;
 
   private final String writerSchemaString;
   private final List<String> readerFields;
   private final CompressionCodecName codec;
 
-  private ExampleFileOperations(String writerSchemaString,
-                                List<String> readerFields,
-                                CompressionCodecName codec) {
+  private ExampleParquetFileOperations(String writerSchemaString,
+                                       List<String> readerFields,
+                                       CompressionCodecName codec) {
     super(Compression.UNCOMPRESSED, MimeTypes.BINARY);
     this.writerSchemaString = writerSchemaString;
     this.readerFields = readerFields;
@@ -66,41 +62,41 @@ public class ExampleFileOperations extends FileOperations<Example> {
   }
 
   // read all fields
-  public static ExampleFileOperations of(Schema writerSchema) {
+  public static ExampleParquetFileOperations of(Schema writerSchema) {
     return of(writerSchema, null, DEFAULT_CODEC);
   }
 
   // read all fields
-  public static ExampleFileOperations of(Schema writerSchema, CompressionCodecName codec) {
-    return new ExampleFileOperations(writerSchema.toJson(), null, codec);
+  public static ExampleParquetFileOperations of(Schema writerSchema, CompressionCodecName codec) {
+    return new ExampleParquetFileOperations(writerSchema.toJson(), null, codec);
   }
 
   // read with projection
-  public static ExampleFileOperations of(Schema writerSchema,
-                                         List<String> readerFields) {
+  public static ExampleParquetFileOperations of(Schema writerSchema,
+                                                List<String> readerFields) {
     return of(writerSchema, readerFields, DEFAULT_CODEC);
   }
 
   // read with projection
-  public static ExampleFileOperations of(Schema writerSchema,
-                                         List<String> readerFields,
-                                         CompressionCodecName codec) {
-    return new ExampleFileOperations(writerSchema.toJson(), readerFields, codec);
+  public static ExampleParquetFileOperations of(Schema writerSchema,
+                                                List<String> readerFields,
+                                                CompressionCodecName codec) {
+    return new ExampleParquetFileOperations(writerSchema.toJson(), readerFields, codec);
   }
 
   // read all fields
-  public static ExampleFileOperations readOnly() {
+  public static ExampleParquetFileOperations readOnly() {
     return readOnly(null, DEFAULT_CODEC);
   }
 
   // read with projection
-  public static ExampleFileOperations readOnly(List<String> readerFields) {
+  public static ExampleParquetFileOperations readOnly(List<String> readerFields) {
     return readOnly(readerFields, DEFAULT_CODEC);
   }
 
   // read with projection
-  public static ExampleFileOperations readOnly(List<String> readerFields,
-                                               CompressionCodecName codec) {
+  public static ExampleParquetFileOperations readOnly(List<String> readerFields,
+                                                      CompressionCodecName codec) {
     return of(null, readerFields, codec);
   }
 
