@@ -17,6 +17,8 @@
 
 package com.spotify.scio.smb.syntax
 
+import java.util.function.Consumer
+
 import com.spotify.scio.ScioContext
 import com.spotify.scio.annotations.experimental
 import com.spotify.scio.coders.Coder
@@ -350,7 +352,7 @@ final class SortedBucketScioContext(@transient private val self: ScioContext) ex
   ) extends Serializable {
 
     def via(
-      transformFn: (K, R, SortedBucketTransform.OutputCollector[W]) => Unit
+      transformFn: (K, R, Consumer[W]) => Unit
     ): ClosedTap[Nothing] = {
       val fn = new SortedBucketTransform.TransformFn[K, W]() {
         override def writeTransform(

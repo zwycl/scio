@@ -1189,6 +1189,7 @@ lazy val `scio-smb`: Project = project
     IntegrationTest
   )
   .dependsOn(
+    `scio-avro`,
     `scio-core`,
     `scio-test` % "test;it",
     `scio-avro` % IntegrationTest
