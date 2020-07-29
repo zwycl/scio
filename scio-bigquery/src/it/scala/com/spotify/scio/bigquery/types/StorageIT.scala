@@ -53,7 +53,7 @@ class StorageIT extends AnyFlatSpec with Matchers {
       )
     }.asJava
     val (sc, _) = ContextAndArgs(
-      Array("--project=data-integration-test", "--tempLocation=gs://data-integration-test-eu/temp")
+      Array("--project=data-integration-test", "--tempLocation=gs://data-integration-test-us/temp")
     )
     val p = sc.typedBigQuery[Required]().internal
     PAssert.that(p).containsInAnyOrder(expected)
@@ -78,7 +78,7 @@ class StorageIT extends AnyFlatSpec with Matchers {
       )
     }.asJava
     val (sc, _) = ContextAndArgs(
-      Array("--project=data-integration-test", "--tempLocation=gs://data-integration-test-eu/temp")
+      Array("--project=data-integration-test", "--tempLocation=gs://data-integration-test-us/temp")
     )
     val p = sc.typedBigQuery[Optional]().internal
     PAssert.that(p).containsInAnyOrder(expected)
@@ -103,7 +103,7 @@ class StorageIT extends AnyFlatSpec with Matchers {
       )
     }.asJava
     val (sc, _) = ContextAndArgs(
-      Array("--project=data-integration-test", "--tempLocation=gs://data-integration-test-eu/temp")
+      Array("--project=data-integration-test", "--tempLocation=gs://data-integration-test-us/temp")
     )
     val p = sc.typedBigQuery[Repeated]().internal
     PAssert.that(p).containsInAnyOrder(expected)
@@ -113,7 +113,7 @@ class StorageIT extends AnyFlatSpec with Matchers {
   it should "work with selectedFields" in {
     val expected = (0 until 10).map(i => (i.toLong, s"s$i", i.toLong)).asJava
     val (sc, _) = ContextAndArgs(
-      Array("--project=data-integration-test", "--tempLocation=gs://data-integration-test-eu/temp")
+      Array("--project=data-integration-test", "--tempLocation=gs://data-integration-test-us/temp")
     )
     val p = sc
       .typedBigQuery[NestedWithFields]()
@@ -127,7 +127,7 @@ class StorageIT extends AnyFlatSpec with Matchers {
     val expected =
       (0 until 5).map(i => (i.toLong, s"s$i", i.toLong, s"s$i", i.toLong, s"s$i")).asJava
     val (sc, _) = ContextAndArgs(
-      Array("--project=data-integration-test", "--tempLocation=gs://data-integration-test-eu/temp")
+      Array("--project=data-integration-test", "--tempLocation=gs://data-integration-test-us/temp")
     )
     val p = sc
       .typedBigQuery[NestedWithRestriction]()
@@ -144,7 +144,7 @@ class StorageIT extends AnyFlatSpec with Matchers {
     val expected =
       (0 until 3).map(i => (i.toLong, s"s$i", i.toLong, s"s$i", i.toLong, s"s$i")).asJava
     val (sc, _) = ContextAndArgs(
-      Array("--project=data-integration-test", "--tempLocation=gs://data-integration-test-eu/temp")
+      Array("--project=data-integration-test", "--tempLocation=gs://data-integration-test-us/temp")
     )
     val p = sc
       .typedBigQueryStorage[NestedWithRestriction](rowRestriction = "required.int < 3")
@@ -160,7 +160,7 @@ class StorageIT extends AnyFlatSpec with Matchers {
   it should "work with all options" in {
     val expected = (0 until 5).map(i => (i.toLong, s"s$i", i.toLong)).asJava
     val (sc, _) = ContextAndArgs(
-      Array("--project=data-integration-test", "--tempLocation=gs://data-integration-test-eu/temp")
+      Array("--project=data-integration-test", "--tempLocation=gs://data-integration-test-us/temp")
     )
     val p = sc
       .typedBigQuery[NestedWithAll](Table.Spec(NestedWithAll.table.format("nested")))
@@ -188,7 +188,7 @@ class StorageIT extends AnyFlatSpec with Matchers {
       )
     }.asJava
     val (sc, _) = ContextAndArgs(
-      Array("--project=data-integration-test", "--tempLocation=gs://data-integration-test-eu/temp")
+      Array("--project=data-integration-test", "--tempLocation=gs://data-integration-test-us/temp")
     )
 
     val p = sc.typedBigQueryStorage[FromQuery]().internal
@@ -215,7 +215,7 @@ class StorageIT extends AnyFlatSpec with Matchers {
       )
     }.asJava
     val (sc, _) = ContextAndArgs(
-      Array("--project=data-integration-test", "--tempLocation=gs://data-integration-test-eu/temp")
+      Array("--project=data-integration-test", "--tempLocation=gs://data-integration-test-us/temp")
     )
     val p = sc.typedBigQuery[FromTable]().internal
     PAssert.that(p).containsInAnyOrder(expected)
@@ -225,7 +225,7 @@ class StorageIT extends AnyFlatSpec with Matchers {
   it should "work with toTable" in {
     val expected = (0 until 10).map(_ => ToTableRequired(true)).asJava
     val (sc, _) = ContextAndArgs(
-      Array("--project=data-integration-test", "--tempLocation=gs://data-integration-test-eu/temp")
+      Array("--project=data-integration-test", "--tempLocation=gs://data-integration-test-us/temp")
     )
     val p = sc
       .typedBigQueryStorage[ToTableRequired](Table.Spec("data-integration-test:storage.required"))
@@ -252,7 +252,7 @@ class StorageIT extends AnyFlatSpec with Matchers {
       )
     }.asJava
     val (sc, _) = ContextAndArgs(
-      Array("--project=data-integration-test", "--tempLocation=gs://data-integration-test-eu/temp")
+      Array("--project=data-integration-test", "--tempLocation=gs://data-integration-test-us/temp")
     )
     val p = sc.typedBigQuery[FromQuery]().internal
     PAssert.that(p).containsInAnyOrder(expected)
