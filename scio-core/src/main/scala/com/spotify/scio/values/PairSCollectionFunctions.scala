@@ -23,7 +23,11 @@ import java.util.{Map => JMap}
 import com.google.common.hash.Funnel
 import com.spotify.scio.ScioContext
 import com.spotify.scio.coders.{Coder, CoderMaterializer}
-import com.spotify.scio.estimators.ApproxDistinctCounter
+import com.spotify.scio.estimators.{
+  ApproxDistinctCounter,
+  ApproximateUniqueCounter,
+  ApproximateUniqueCounterByError
+}
 import com.spotify.scio.hash._
 import com.spotify.scio.util._
 import com.spotify.scio.util.random.{BernoulliValueSampler, PoissonValueSampler}
@@ -700,10 +704,15 @@ class PairSCollectionFunctions[K, V](val self: SCollection[(K, V)]) {
    * more accurate the estimate will be; should be `>= 16`.
    * @group per_key
    */
+  @deprecated(
+    "use SCollection[(K, V)]#approximateDistinctCountPerKey(ApproximateUniqueCounter(sampleSize) instead",
+    "0.9.5"
+  )
   def countApproxDistinctByKey(
     sampleSize: Int
   )(implicit koder: Coder[K], voder: Coder[V]): SCollection[(K, Long)] =
-    this.applyPerKey(ApproximateUnique.perKey[K, V](sampleSize))(klToTuple)
+    ApproximateUniqueCounter(sampleSize)
+      .estimateDistinctCountPerKey(this.self)
 
   /**
    * Count approximate number of distinct values for each key in the SCollection.
@@ -711,10 +720,37 @@ class PairSCollectionFunctions[K, V](val self: SCollection[(K, V)]) {
    * `[0.01, 0.5]`.
    * @group per_key
    */
+  @deprecated(
+    "use SCollection[(K, V)]#approximateDistinctCountPerKey(ApproximateUniqueCounterByError(maximumEstimationError)) instead",
+    "0.9.5"
+  )
   def countApproxDistinctByKey(
     maximumEstimationError: Double = 0.02
   )(implicit koder: Coder[K], voder: Coder[V]): SCollection[(K, Long)] =
-    this.applyPerKey(ApproximateUnique.perKey[K, V](maximumEstimationError))(klToTuple)
+    ApproximateUniqueCounterByError(maximumEstimationError)
+      .estimateDistinctCountPerKey(this.self)
+
+  /**
+   * Return a new SCollection of (key, value) pairs where value is estimated distinct count(as Long) per each unique key.
+   * Correctness of the estimation is depends on the given [[ApproxDistinctCounter]] estimator.
+   *
+   * @Example
+   * {{{
+   *   val input: SCollection[(K, V)] = ...
+   *   val distinctCount: SCollection[(K, Long)] =
+   *       input.approximateDistinctCountPerKey(ApproximateUniqueCounter(sampleSize))
+   * }}}
+   *
+   * There are two different HLL++ implementations available in the `scio-extra` module.
+   *  - [[com.spotify.scio.extra.hll.sketching.SketchingHyperLogLogPlusPlus]]
+   *  - [[com.spotify.scio.extra.hll.zetasketch.ZetasketchHllCount*]]
+   * @return a key valued SCollection where value type is Long.
+   */
+  def approximateDistinctCountPerKey(estimator: ApproxDistinctCounter[V])(implicit
+    koder: Coder[K],
+    voder: Coder[V]
+  ): SCollection[(K, Long)] =
+    estimator.estimateDistinctCountPerKey(this.self)
 
   /**
    * Count the number of elements for each key.
@@ -733,17 +769,6 @@ class PairSCollectionFunctions[K, V](val self: SCollection[(K, V)]) {
    */
   def distinctByKey(implicit koder: Coder[K], voder: Coder[V]): SCollection[(K, V)] =
     self.distinctBy(_._1)
-
-  /**
-   * Return a new SCollection of (key, value) pairs where value is estimated distinct count(as Long) per each unique key.
-   * Correctness of the estimation is depends on the given estimator.
-   * @return a key valued SCollection where value type is Long.
-   */
-  def approximateDistinctCountPerKey(estimator: ApproxDistinctCounter[V])(implicit
-    koder: Coder[K],
-    voder: Coder[V]
-  ): SCollection[(K, Long)] =
-    estimator.estimateDistinctCountPerKey(this.self)
 
   /**
    * Return a new SCollection of (key, value) pairs whose values satisfy the predicate.
