@@ -23,6 +23,7 @@ import java.util.{Map => JMap}
 import com.google.common.hash.Funnel
 import com.spotify.scio.ScioContext
 import com.spotify.scio.coders.{Coder, CoderMaterializer}
+import com.spotify.scio.estimators.ApproxDistinctCounter
 import com.spotify.scio.hash._
 import com.spotify.scio.util._
 import com.spotify.scio.util.random.{BernoulliValueSampler, PoissonValueSampler}
@@ -30,6 +31,7 @@ import com.twitter.algebird.{Aggregator, Monoid, MonoidAggregator, Semigroup}
 import org.apache.beam.sdk.transforms._
 import org.apache.beam.sdk.values.{KV, PCollection, PCollectionView}
 import org.slf4j.LoggerFactory
+
 import scala.collection.compat.immutable.ArraySeq
 
 private object PairSCollectionFunctions {
@@ -731,6 +733,17 @@ class PairSCollectionFunctions[K, V](val self: SCollection[(K, V)]) {
    */
   def distinctByKey(implicit koder: Coder[K], voder: Coder[V]): SCollection[(K, V)] =
     self.distinctBy(_._1)
+
+  /**
+   * Return a new SCollection of (key, value) pairs where value is estimated distinct count(as Long) per each unique key.
+   * Correctness of the estimation is depends on the given estimator.
+   * @return a key valued SCollection where value type is Long.
+   */
+  def approximateDistinctCountPerKey(estimator: ApproxDistinctCounter[V])(implicit
+    koder: Coder[K],
+    voder: Coder[V]
+  ): SCollection[(K, Long)] =
+    estimator.estimateDistinctCountPerKey(this.self)
 
   /**
    * Return a new SCollection of (key, value) pairs whose values satisfy the predicate.
